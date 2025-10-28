@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventureWorksGraphQLDemo", "AdventureWorksGraphQLDemo\AdventureWorksGraphQLDemo.csproj", "{6E65F293-534B-A4EA-CCA8-34AD9AA1E96B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynGenerator", "RoslynGenerator\RoslynGenerator.csproj", "{0337FA00-9B32-9380-7A65-7C4BF0B98C83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{6E65F293-534B-A4EA-CCA8-34AD9AA1E96B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E65F293-534B-A4EA-CCA8-34AD9AA1E96B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E65F293-534B-A4EA-CCA8-34AD9AA1E96B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0337FA00-9B32-9380-7A65-7C4BF0B98C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0337FA00-9B32-9380-7A65-7C4BF0B98C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0337FA00-9B32-9380-7A65-7C4BF0B98C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0337FA00-9B32-9380-7A65-7C4BF0B98C83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

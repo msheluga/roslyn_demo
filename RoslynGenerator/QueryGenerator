@@ -1,6 +1,0 @@
-namespace RoslynGenerator.QueryGenerator
-{
-    public class QueryGenerator
-    {
-    }
-}

@@ -1,6 +1,6 @@
-﻿using QueryGenerator;
+﻿
 // See https://aka.ms/new-console-template for more information
-using RoslynGenerator.QueryGenerator;
+
 
 Console.WriteLine("Generate GraphQL Queries");
 
