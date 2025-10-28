@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdventureWorksGraphQLDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+08228040f1be1062a32c4a4ad431b6eed4961a62")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7e14e1ee13662c248517046c582224603e81e53")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdventureWorksGraphQLDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdventureWorksGraphQLDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
