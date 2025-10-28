@@ -1,0 +1,15 @@
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.GeneratedMSBuildEditorConfig.editorconfig
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.AssemblyInfoInputs.cache
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.AssemblyInfo.cs
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.csproj.CoreCompileInputs.cache
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.sourcelink.json
+E:\DATSO\roslyn_demo\RoslynGenerator\bin\Debug\net9.0\RoslynGenerator.exe
+E:\DATSO\roslyn_demo\RoslynGenerator\bin\Debug\net9.0\RoslynGenerator.deps.json
+E:\DATSO\roslyn_demo\RoslynGenerator\bin\Debug\net9.0\RoslynGenerator.runtimeconfig.json
+E:\DATSO\roslyn_demo\RoslynGenerator\bin\Debug\net9.0\RoslynGenerator.dll
+E:\DATSO\roslyn_demo\RoslynGenerator\bin\Debug\net9.0\RoslynGenerator.pdb
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.dll
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\refint\RoslynGenerator.dll
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.pdb
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\RoslynGenerator.genruntimeconfig.cache
+E:\DATSO\roslyn_demo\RoslynGenerator\obj\Debug\net9.0\ref\RoslynGenerator.dll
