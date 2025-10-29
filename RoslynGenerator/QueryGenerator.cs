@@ -1,5 +1,6 @@
 ﻿
 
+using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -59,9 +60,76 @@ public class QueryGenerator
         @namespace = @namespace
             .AddUsings(CreateUsingDirectives());
 
-        var dbName = Configuration.GetValue<string>("")
+        var dbName = Configuration.GetValue<string>("DBName");
+        var dbConnectionString = Configuration.GetValue<string>("ConnectionString");
+        var scaffoldAssemblyDirectory = Configuration.GetValue<string>("DALDebugDirectory");
+        var contextNamespace = Configuration.GetValue<string>("DBNameSpace");
+
+        //convert the information to a DBContext 
+        using var context = GetDbContextInstance(dbName, dbConnectionString, scaffoldAssemblyDirectory, contextNamespace);
+
+        var entityTypes = context.Model.GetEntityTypes().Select(e => e.ClrType);
+        var dbSets = GetDbSetProperties(context.GetType());
+
+        var contextFactoryProperty = SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName($"IDbContextFactory<{context.GetType().Name}>"), $"DbContextFactory_{dbName }")
+                                                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.PrivateKeyword))
+                                                    .AddAccessorListAccessors(SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)));
+
+        //  Create a class
+        var classDeclaration = SyntaxFactory.ClassDeclaration(ClassName).AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword));
+
+        //Ensure our class derives from the right base class
+        classDeclaration = classDeclaration.AddBaseListTypes(
+            SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName($"QueryBase")));
+
+        var constructor = CreateConstructor(context.GetType().Name);
+
+        //Adds the constructor and methods to the class declaration.
+        classDeclaration = classDeclaration.AddMembers(constructor, contextFactoryProperty);
+        classDeclaration = classDeclaration.AddMembers(CreateMethods(entityTypes, dbSets).ToArray());
+
+        //Closes the class and adds comments to the top.
+        classDeclaration = classDeclaration.WithCloseBraceToken(classDeclaration.CloseBraceToken)
+                            .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(@"/// <summary>
+    /// Provides a means to expose each entity type through an aptly named method.
+    /// </summary>" + Environment.NewLine));
+
+        @namespace = @namespace.AddMembers(classDeclaration);
+        code = @namespace
+                .NormalizeWhitespace()
+                .ToFullString();
 
         return code;
+    }
+
+    private static ConstructorDeclarationSyntax CreateConstructor(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static IEnumerable<MethodDeclarationSyntax> CreateMethods(IEnumerable<Type> entityTypes, object dbSets)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static object GetDbSetProperties(Type type)
+    {
+        var dbSetProperties = new List<PropertyInfo>();
+        var properties = type.GetProperties();
+
+        foreach (var property in properties)
+        {
+            var setType = property.PropertyType;
+
+            var isDbSet = setType.IsGenericType && typeof(DbSet<>).IsAssignableFrom(setType.GetGenericTypeDefinition());
+
+            if (isDbSet)
+            {
+                dbSetProperties.Add(property);
+            }
+        }
+
+        return dbSetProperties;
     }
 
     private static NamespaceDeclarationSyntax AddComment(NamespaceDeclarationSyntax nds, string methodName, string className)
@@ -115,6 +183,7 @@ public class QueryGenerator
         var options = SqlServerDbContextOptionsExtensions.UseSqlServer(optionsBuilder, dbConnectionString).Options;
 
         var context = (DbContext)Activator.CreateInstance(contextType, new object[] { options });
+
         return context;
     }
 }
