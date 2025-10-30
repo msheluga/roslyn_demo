@@ -181,7 +181,7 @@ public class QueryGenerator
         var parameterList = SyntaxFactory.ParameterList();
 
         var statementArray = GetStatementSyntaxArray(
-                                $@"var context = DbContextFactory_{_queryInfo.SelectedDBContext}.CreateDbContext();
+                                $@"var context = DbContextFactory_{dbSetName}.CreateDbContext();
 return GetData<{entityType.Name}>(context.{dbSetName}).AsNoTracking();");
 
         var method = SyntaxFactory.MethodDeclaration(
