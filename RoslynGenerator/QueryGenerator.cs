@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -102,17 +103,81 @@ public class QueryGenerator
         return code;
     }
 
-    private static ConstructorDeclarationSyntax CreateConstructor(string name)
+    private static ConstructorDeclarationSyntax CreateConstructor(string dbContextTypeName)
     {
-        throw new NotImplementedException();
+        var constructor = SyntaxFactory.ConstructorDeclaration("Query").WithParameterList(CreateConstructorParameters(dbContextTypeName))
+               .WithInitializer(
+                   SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer)
+                   // could be BaseConstructorInitializer or ThisConstructorInitializer
+                   .AddArgumentListArguments(
+                      SyntaxFactory.Argument(SyntaxFactory.IdentifierName("cachingService")),
+                      SyntaxFactory.Argument(SyntaxFactory.IdentifierName("contextAccessor")),
+                      SyntaxFactory.Argument(SyntaxFactory.IdentifierName("options")),
+                      SyntaxFactory.Argument(SyntaxFactory.IdentifierName("config"))
+                   )
+               )
+               .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+               .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(@"/// <summary>
+        /// Initializes a new instance of the <see cref=""Query""/> class.
+        /// </summary>
+        /// <param name=""factory""></param>
+        /// <param name=""cachingService""></param>
+        /// <param name=""contextAccessor""></param>
+        /// <param name=""options""></param> 
+        /// <param name=""config""></param>" + Environment.NewLine));
+        constructor = constructor.AddBodyStatements(GetStatementSyntaxArray($"DbContextFactory_{dbContextTypeName} = factory;"));
+        return constructor;
     }
 
-    private static IEnumerable<MethodDeclarationSyntax> CreateMethods(IEnumerable<Type> entityTypes, object dbSets)
+    private static StatementSyntax[] GetStatementSyntaxArray(string methodStatements)
     {
-        throw new NotImplementedException();
+        var statementLines = Regex.Split(methodStatements, @"(?<=[;])");
+        var statementArray = new StatementSyntax[statementLines.Length];
+        for (int i = 0; i < statementLines.Length; i++)
+        {
+            statementArray[i] = SyntaxFactory.ParseStatement(statementLines[i]);
+        }
+        return statementArray;
     }
 
-    private static object GetDbSetProperties(Type type)
+    private static ParameterListSyntax CreateConstructorParameters(object dbContextTypeName)
+    {
+        var dbContextParameter = SyntaxFactory.Parameter(default, SyntaxFactory.TokenList(),
+                                                       SyntaxFactory.ParseTypeName($"IDbContextFactory<{dbContextTypeName}>"),
+                                                       SyntaxFactory.Identifier("factory"), null);
+        var portalCachingServiceParameter = SyntaxFactory.Parameter(default, SyntaxFactory.TokenList(),
+                                                    SyntaxFactory.ParseTypeName("IAPICachingService"),
+                                                    SyntaxFactory.Identifier("cachingService"), null);
+        var httpContextAccessorParameter = SyntaxFactory.Parameter(default, SyntaxFactory.TokenList(),
+                                                    SyntaxFactory.ParseTypeName("IHttpContextAccessor"),
+                                                    SyntaxFactory.Identifier("contextAccessor"), null);        
+        var configurationParameter = SyntaxFactory.Parameter(default, SyntaxFactory.TokenList(),
+                                                    SyntaxFactory.ParseTypeName("IConfiguration"),
+                                                    SyntaxFactory.Identifier("config"), null);
+        IEnumerable<ParameterSyntax> parameters = new List<ParameterSyntax>()
+            {
+                dbContextParameter, portalCachingServiceParameter,
+                httpContextAccessorParameter, configurationParameter
+            };
+        return SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters));
+    }
+
+    private static IEnumerable<MethodDeclarationSyntax> CreateMethods(IEnumerable<Type> entityTypes, List<PropertyInfo> dbSets)
+    {
+        List<MethodDeclarationSyntax> methods = new List<MethodDeclarationSyntax>();
+        foreach (var entityType in entityTypes)
+        {
+            //We don't want methods to retreive data from views.
+            if (!(entityType.Name.Contains("Vw") && entityType.Name.Contains("E920")))
+            {
+                var dbSetName = dbSets?.FirstOrDefault(d => d.PropertyType.GetGenericArguments()[0].Equals(entityType))?.Name;
+                methods.Add(CreateMethodDeclarationForEntity(entityType, dbSetName));
+            }
+        }
+        return methods;
+    }
+
+    private static List<PropertyInfo> GetDbSetProperties(Type type)
     {
         var dbSetProperties = new List<PropertyInfo>();
         var properties = type.GetProperties();

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RoslynGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+389a6f3e0822a6bbe94b86ebbae5a20e9d5c7f41")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4da9ef1ff4aea86c80324761a44bbc9ed4b65311")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoslynGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoslynGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
