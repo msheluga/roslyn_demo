@@ -122,8 +122,7 @@ public class QueryGenerator
         /// </summary>
         /// <param name=""factory""></param>
         /// <param name=""cachingService""></param>
-        /// <param name=""contextAccessor""></param>
-        /// <param name=""options""></param> 
+        /// <param name=""contextAccessor""></param>    
         /// <param name=""config""></param>" + Environment.NewLine));
         constructor = constructor.AddBodyStatements(GetStatementSyntaxArray($"DbContextFactory_{dbContextTypeName} = factory;"));
         return constructor;
@@ -168,11 +167,54 @@ public class QueryGenerator
         foreach (var entityType in entityTypes)
         {       
             var dbSetName = dbSets?.FirstOrDefault(d => d.PropertyType.GetGenericArguments()[0].Equals(entityType))?.Name;
-            methods.Add(CreateMethodDeclarationForEntity(entityType, dbSetName));
-            
+            methods.Add(CreateMethodDeclarationForEntity(entityType, dbSetName));            
         }
         return methods;
     }
+
+    private MethodDeclarationSyntax CreateMethodDeclarationForEntity(Type entityType, string dbSetName)
+    {
+        var methodAttributes = GetAttributeList(MethodAttributes.ToArray());
+        var returnType = $"IQueryable<{entityType.Name}>";
+        var methodName = $"Get{dbSetName}";
+
+        var parameterList = SyntaxFactory.ParameterList();
+
+        var statementArray = GetStatementSyntaxArray(
+                                $@"var context = DbContextFactory_{_queryInfo.SelectedDBContext}.CreateDbContext();
+return GetData<{entityType.Name}>(context.{dbSetName}).AsNoTracking();");
+
+        var method = SyntaxFactory.MethodDeclaration(
+                  attributeLists: methodAttributes,
+                  modifiers: SyntaxFactory.TokenList().Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword)),
+                  returnType: SyntaxFactory.ParseTypeName(returnType),
+                  explicitInterfaceSpecifier: null,
+                  identifier: SyntaxFactory.Identifier(methodName),
+                  typeParameterList: null,
+                  parameterList: parameterList, //parameterlist can't be null
+                  constraintClauses: SyntaxFactory.List<TypeParameterConstraintClauseSyntax>(),
+                  body: null,
+                  semicolonToken: default).WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(
+                      $@"/// <summary>
+        /// Gets the {dbSetName}.
+        /// </summary>
+        /// <returns>An IQueryable of {entityType.Name}</returns>" + Environment.NewLine));
+        return method.AddBodyStatements(statementArray);
+    }
+
+    protected static SyntaxList<AttributeListSyntax> GetAttributeList(params string[] attributeNames)
+    {
+        SyntaxList<AttributeListSyntax> attributes = SyntaxFactory.List<AttributeListSyntax>();
+        foreach (var attributeName in attributeNames)
+        {
+            attributes = attributes.Add(SyntaxFactory.AttributeList(
+                                            SyntaxFactory.SingletonSeparatedList(
+                                                SyntaxFactory.Attribute(
+                                                    SyntaxFactory.IdentifierName(attributeName)))));
+        }
+        return attributes;
+    }
+
 
     private static List<PropertyInfo> GetDbSetProperties(Type type)
     {
