@@ -166,13 +166,10 @@ public class QueryGenerator
     {
         List<MethodDeclarationSyntax> methods = new List<MethodDeclarationSyntax>();
         foreach (var entityType in entityTypes)
-        {
-            //We don't want methods to retreive data from views.
-            if (!(entityType.Name.Contains("Vw") && entityType.Name.Contains("E920")))
-            {
-                var dbSetName = dbSets?.FirstOrDefault(d => d.PropertyType.GetGenericArguments()[0].Equals(entityType))?.Name;
-                methods.Add(CreateMethodDeclarationForEntity(entityType, dbSetName));
-            }
+        {       
+            var dbSetName = dbSets?.FirstOrDefault(d => d.PropertyType.GetGenericArguments()[0].Equals(entityType))?.Name;
+            methods.Add(CreateMethodDeclarationForEntity(entityType, dbSetName));
+            
         }
         return methods;
     }
